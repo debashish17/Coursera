@@ -19,7 +19,7 @@ adminRouter.post("/signup",async function(req,res){
         message:"Succussfull SignUp"
     })
 })
-adminRouter.post("/singin", async function(req,res){
+adminRouter.post("/signin", async function(req,res){
     const { email,password }=req.body;
     const admin =await adminModel.findOne({
         email:email,
@@ -28,7 +28,7 @@ adminRouter.post("/singin", async function(req,res){
     if (admin)
     {
         const token=jwt.sign({
-            id:user._id
+            id:admin._id
         },JWT_ADMIN_PASSWORD);
 
         //cookie
@@ -47,7 +47,7 @@ adminRouter.post("/course",adminMiddleware,async function(req,res){
         const adminId=req.userId;
         const { title , description , price, imageUrl }=req.body;
 
-        await courseModel.create ({
+        const course = await courseModel.create ({
                 title,
                 description,
                 price,
@@ -59,11 +59,35 @@ adminRouter.post("/course",adminMiddleware,async function(req,res){
             courseId:course._id
         })
 })
-adminRouter.put("/course",function(req,res){
+adminRouter.put("/course",adminMiddleware, async function(req,res){
+        const adminId=req.userId;
 
+        const { title ,description ,price ,imageUrl ,courseId }=req.body;
+        
+        const course = await courseModel.updateOne({
+                _id:courseId,
+                creatorId:adminId
+            },{
+                title:title,
+                description:description,
+                price:price,
+                imageUrl:imageUrl
+            })
+        
+        res.json({
+            message:"Course Updated",
+            courseId:course._id
+        })
 })
-adminRouter.get("/course/bulk",function(req,res){
-
+adminRouter.get("/course/bulk",adminMiddleware,async function(req,res){
+    const adminId=req.userId;
+    const courses=await courseModel.find({
+        creatorId:adminId
+    })
+    res.json({
+        messages:"Alll your courses",
+        courses
+    })
 })
 
 module.exports={
