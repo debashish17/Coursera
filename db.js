@@ -1,5 +1,4 @@
 const mongoose=require("mongoose");
-mongoose.connect("mongodb+srv://dbxadmin:Debashish1729@cluster0.6jykrbm.mongodb.net/coursera-app");
 const Schema=mongoose.Schema;
 const ObjectId=mongoose.Types.ObjectId;
 
